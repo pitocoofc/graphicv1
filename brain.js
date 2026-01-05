@@ -1,6 +1,35 @@
 // brain.js - Dicionário Nexos AI v1.5 (GitHub Pages Expanded)
 const brain = [
     // --- SAUDAÇÕES E EDUCAÇÃO ---
+    // brain.js - Nexos AI (Scripts e Destaques)
+const brain = [
+    {
+        inputs: ["oi", "olá", "opa", "eai"],
+        outputs: ["Opa! Tudo certo? Precisando de algum script ou ajuda com o cenário?"]
+    },
+    {
+        inputs: ["girar", "rotação", "rodar"],
+        outputs: [
+            "Para fazer um objeto girar no eixo Y, use este código no seu script:\n<pre><code>function update() {\n  this.rotation.y += 0.02;\n}</code></pre>",
+            "Você pode alterar a velocidade mudando o valor <code>0.02</code> no código!"
+        ]
+    },
+    {
+        inputs: ["pular", "pulo", "saltar"],
+        outputs: [
+            "Aqui está a base para um pulo simples:\n<pre><code>if(input.isKeyDown('space')) {\n  this.velocity.y = 10;\n}</code></pre>"
+        ]
+    },
+    {
+        inputs: ["cor", "colorir", "mudar cor"],
+        outputs: [
+            "Para mudar a cor de um objeto via script:\n<pre><code>this.material.color = 'rgb(0, 255, 0)'; // Verde</code></pre>"
+        ]
+    },
+    {
+        inputs: ["ajuda", "comandos"],
+        outputs: ["Tente me perguntar: <b>'como girar um bloco'</b>, <b>'script de pulo'</b> ou <b>'mudar cor'</b>!"]
+    },
     {
         inputs: ["oi", "olá", "ola", "opa", "eai", "ei", "salve", "yo", "fala", "oii", "e aí", "beleza", "blz", "oopa"],
         outputs: [
