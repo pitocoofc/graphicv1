@@ -46,40 +46,48 @@
 </div>
 
 <script>
+    <script type="module">
+    import brain from './brain.js';
+
     const chat = document.getElementById('chat-window');
     const input = document.getElementById('user-input');
 
-    function sendMessage() {
-        const text = input.value;
+    window.sendMessage = () => {
+        const text = input.value.toLowerCase().trim();
         if(!text) return;
 
-        // Mensagem do Usuário
-        addMsg(text, 'user');
+        addMsg(input.value, 'user');
         input.value = "";
 
-        // Lógica de Resposta da IA (Simulada)
         setTimeout(() => {
-            let response = "Interessante! Posso te ajudar com isso. No momento estou aprendendo a manipular os scripts do seu motor.";
-            
-            if(text.toLowerCase().includes("girar")) {
-                response = "Aqui está um script básico para girar um objeto no eixo Y:<br><pre>-- Script de Rotação\nfunction update() {\n  objeto.rotation.y += 0.02;\n}</pre>";
-            } else if(text.toLowerCase().includes("céu") || text.toLowerCase().includes("sky")) {
-                response = "Para mudar o céu, você pode usar o arquivo 'Sky' no Explorer e colar uma URL de imagem 360 do site Polyhaven, por exemplo!";
+            let response = "Desculpe, ainda não aprendi sobre isso. Mas você pode me ensinar adicionando essa palavra ao brain.js!";
+
+            // Lógica de busca no dicionário
+            for (let item of brain) {
+                // Verifica se alguma das palavras-chave está no que o usuário digitou
+                const match = item.inputs.some(keyword => text.includes(keyword));
+                
+                if (match) {
+                    // Escolhe uma resposta aleatória da lista de outputs
+                    response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
+                    break;
+                }
             }
 
             addMsg(response, 'bot');
-        }, 800);
+        }, 600);
     }
 
     function addMsg(text, type) {
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-        div.innerHTML = text;
+        div.innerHTML = text.replace(/\n/g, '<br>'); // Mantém as quebras de linha do código
         chat.appendChild(div);
         chat.scrollTop = chat.scrollHeight;
     }
 
     input.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(); });
+</script>
 </script>
 
 </body>
