@@ -3,128 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Studio - Versões</title>
+    <title>Nexos AI - Engine v1.0</title>
     <style>
-        :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; }
-        body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); display: flex; height: 100vh; }
+        :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; --user-msg: #6a1b9a; }
+        body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
-        #ai-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; }
+        #ai-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; background: #111; }
         
-        .header { padding: 15px 20px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .version-info { display: flex; flex-direction: column; }
-        .header h2 { margin: 0; font-size: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        .header { padding: 15px 20px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
+        .version-box { display: flex; flex-direction: column; }
+        .header h2 { margin: 0; font-size: 16px; color: var(--accent); letter-spacing: 1px; }
         
-        /* Seletor de Versão */
-        #version-selector { background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 5px; padding: 2px 5px; font-size: 12px; outline: none; cursor: pointer; }
+        #version-selector { background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 5px; padding: 2px; font-size: 11px; margin-top: 5px; cursor: pointer; }
 
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: 0.3s; }
+        .back-btn:hover { background: var(--accent); color: white; }
 
-        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 14px; line-height: 1.5; position: relative; }
-        .msg.user { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 2px; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; animation: slideIn 0.2s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg.user { align-self: flex-end; background: var(--user-msg); color: white; border-bottom-right-radius: 2px; }
         .msg.bot { align-self: flex-start; background: #252526; border: 1px solid #333; border-bottom-left-radius: 2px; }
 
-        .input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; }
+        .input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; border-top: 1px solid #333; }
         input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; outline: none; }
         button#send { background: var(--accent); border: none; color: white; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        pre { background: #000; padding: 10px; border-radius: 5px; overflow-x: auto; color: #4fc3f7; border: 1px solid #333; font-family: monospace; }
-        .badge { font-size: 10px; color: #888; margin-top: 4px; display: block; }
+        pre { background: #000; padding: 12px; border-radius: 8px; overflow-x: auto; color: #4fc3f7; border: 1px solid #222; font-family: 'Consolas', monospace; margin-top: 10px; }
+        code { color: #ffeb3b; }
     </style>
 </head>
 <body>
 
 <div id="ai-container">
     <div class="header">
-        <div class="version-info">
-            <h2>🤖 NEXOS IA 
-                <select id="version-selector" onchange="changeVersion()">
-                    <option value="0.1">v0.1 - Scripters</option>
-                    <option value="0.5">v0.5 - Bate-papo</option>
-                </select>
-            </h2>
-            <span id="current-mode" class="badge">Modo Atual: Programação Direta</span>
+        <div class="version-box">
+            <h2>🤖 NEXOS ENGINE</h2>
+            <select id="version-selector">
+                <option value="0.1">v0.1 - Scripters (Direto)</option>
+                <option value="0.5">v0.5 - Bate-papo (Brain)</option>
+            </select>
         </div>
-        <button class="back-btn" onclick="window.history.back()">VOLTAR AO EDITOR</button>
+        <button class="back-btn" onclick="window.history.back()">VOLTAR AO STUDIO</button>
     </div>
 
     <div id="chat-window">
-        <div class="msg bot" id="welcome-msg">Olá! Estou no modo v0.1 (Scripters). Peça scripts de rotação, pulo ou configuração de céu!</div>
-    </div>
+        </div>
 
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Digite seu comando...">
-        <button id="send" onclick="sendMessage()">ENVIAR</button>
+        <input type="text" id="user-input" placeholder="Diga algo ou peça um código..." autocomplete="off">
+        <button id="send">ENVIAR</button>
     </div>
 </div>
 
 <script type="module">
-    // Importamos o brain para a versão 0.5
     import brain from './brain.js';
 
-    const chat = document.getElementById('chat-window');
-    const input = document.getElementById('user-input');
-    const selector = document.getElementById('version-selector');
-    const modeText = document.getElementById('current-mode');
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send');
+    const versionSel = document.getElementById('version-selector');
 
-    // Tornar a função global para o botão onclick funcionar com type="module"
-    window.sendMessage = function() {
-        const text = input.value;
-        const version = selector.value;
+    // Inicialização da "Bio" (Memória Persistent via LocalStorage)
+    let memory = {
+        lastBotPrompt: localStorage.getItem('nexos_last_bot') || "",
+        userName: localStorage.getItem('nexos_user_name') || "Mestre"
+    };
+
+    // Mensagem de Boas-vindas baseada na memória
+    addMessage(`Olá ${memory.userName}! Sistema carregado. O que vamos desenvolver agora?`, 'bot');
+
+    function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.innerHTML = text.replace(/\n/g, '<br>');
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    async function processResponse() {
+        const rawText = userInput.value;
+        const text = rawText.toLowerCase().trim();
         if(!text) return;
 
-        addMsg(text, 'user');
-        input.value = "";
+        addMessage(rawText, 'user');
+        userInput.value = "";
 
         setTimeout(() => {
             let response = "";
 
-            if (version === "0.1") {
-                // --- LÓGICA v0.1 (SCRIPTERS) ---
-                response = "Interessante! Posso te ajudar com scripts básicos.";
-                let lowText = text.toLowerCase();
-                
-                if(lowText.includes("girar")) {
-                    response = "Aqui está um script de rotação no eixo Y:<br><pre>-- Script de Rotação\nfunction update() {\n  this.rotation.y += 0.02;\n}</pre>";
-                } else if(lowText.includes("ceu") || lowText.includes("sky")) {
-                    response = "Para mudar o céu, selecione o objeto 'Sky' e mude a propriedade Texture!";
-                }
-            } else {
-                // --- LÓGICA v0.5 (BATE-PAPO via brain.js) ---
-                response = "Ainda não aprendi sobre isso no modo Bate-papo.";
-                let lowText = text.toLowerCase();
-                for (let item of brain) {
-                    if (item.inputs.some(k => lowText.includes(k))) {
-                        response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
-                        break;
+            // --- LÓGICA DE CONTINUIDADE (A IA lembra o que perguntou) ---
+            if (memory.lastBotPrompt.includes("tudo bem") && (text.includes("sim") || text.includes("estou"))) {
+                response = "Fico muito feliz em saber! O bom humor ajuda a codar melhor. Vamos para os scripts?";
+            } 
+            else if (memory.lastBotPrompt.includes("como se chama") || memory.lastBotPrompt.includes("seu nome")) {
+                let name = rawText.split(" ").pop();
+                localStorage.setItem('nexos_user_name', name);
+                memory.userName = name;
+                response = `Prazer em te conhecer, ${name}! Vou guardar seu nome na minha memória central.`;
+            }
+
+            // --- SE NÃO HOUVER CONTEXTO, USA O MOTOR SELECIONADO ---
+            if (!response) {
+                if (versionSel.value === "0.1") {
+                    // MODO SCRIPTER (Lógica rápida que você curtiu)
+                    response = "Processando lógica... Não reconheci esse comando de script.";
+                    if(text.includes("girar")) {
+                        response = "Aqui está seu destaque de rotação:\n<pre><code>function update() {\n  this.rotation.y += 0.05;\n}</code></pre>";
+                    } else if(text.includes("ceu") || text.includes("sky")) {
+                        response = "Para o céu: Selecione 'Sky' no Explorer e altere a URL da textura!";
+                    }
+                } else {
+                    // MODO BATE-PAPO (Usa o Brain.js)
+                    response = "Interessante... me conte mais sobre isso ou tente um comando de script.";
+                    for (let item of brain) {
+                        if (item.inputs.some(k => text.includes(k))) {
+                            response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
+                            break;
+                        }
                     }
                 }
             }
 
-            addMsg(response, 'bot');
-        }, 600);
+            // Salva o estado para a próxima interação
+            memory.lastBotPrompt = response.toLowerCase();
+            localStorage.setItem('nexos_last_bot', memory.lastBotPrompt);
+            
+            addMessage(response, 'bot');
+        }, 500);
     }
 
-    window.changeVersion = function() {
-        const v = selector.value;
-        if(v === "0.1") {
-            modeText.innerText = "Modo Atual: Programação Direta";
-            addMsg("Alterado para v0.1 - Scripters. Foco em lógica de jogo.", "bot");
-        } else {
-            modeText.innerText = "Modo Atual: Conversa & Ideias";
-            addMsg("Alterado para v0.5 - Bate-papo. Agora usamos o dicionário expandido.", "bot");
-        }
-    }
-
-    function addMsg(text, type) {
-        const div = document.createElement('div');
-        div.className = `msg ${type}`;
-        div.innerHTML = text;
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
-    }
-
-    input.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(); });
+    sendBtn.onclick = processResponse;
+    userInput.addEventListener("keypress", (e) => { if(e.key === "Enter") processResponse(); });
 </script>
 
 </body>
