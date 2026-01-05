@@ -189,7 +189,7 @@
 
             if (!response) {
                 if (versionSel.value === "0.1") {
-                    if(text.includes("girar")) response = "Script de rotação gerado com sucesso.";
+                    if(text.includes("girar")) response = "Script de rotação:\n<pre><code>this.rotation.y += 0.05;</code></pre>";
                     else if(text.includes("ceu") || text.includes("sky")) response = "Mude o céu no Explorer, na aba Sky.";
                     else response = "Modo Scripter ativo. Tente girar ou pulo.";
                 } else {
