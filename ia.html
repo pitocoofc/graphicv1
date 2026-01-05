@@ -207,7 +207,46 @@
     };
 
     async function process() {
-        const raw = userInput.value;
+    const raw = userInput.value;
+    const text = raw.toLowerCase().trim();
+    if(!text) return;
+
+    addMessage(raw, 'user');
+    userInput.value = "";
+
+    setTimeout(() => {
+        let response = "";
+
+        // 1. Prioridade: Dicionário Exato (Para comandos e saudações)
+        for (let item of brain) {
+            if (item.inputs.some(k => text.includes(k))) {
+                response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
+                break;
+            }
+        }
+
+        // 2. Se não for comando, usa a Cadeia de Markov (Bate-papo Filosófico)
+        if (!response && versionSel.value === "1.4") {
+            const words = text.split(" ");
+            const seed = words[words.length - 1];
+            
+            // Tenta gerar com a semente, mas força a frase a ter pelo menos 4 palavras
+            response = nexosMarkov.gerar(seed);
+            
+            // Se a resposta for muito curta ou inválida, gera uma frase aleatória completa
+            if (response.split(" ").length < 3) {
+                response = nexosMarkov.gerar(); 
+            }
+        }
+
+        if(!response) response = "Interessante... Minha rede neural ainda está processando esse conceito.";
+
+        bio.lastBot = response.toLowerCase();
+        addMessage(response, 'bot');
+        falar(response);
+    }, 600);
+}
+
         const text = raw.toLowerCase().trim();
         if(!text) return;
 
