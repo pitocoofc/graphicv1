@@ -3,57 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexos AI - Engine v1.0</title>
+    <title>Nexos AI - Engine v1.1</title>
     <style>
         :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; --user-msg: #6a1b9a; }
         body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
-        #ai-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; background: #111; }
+        #ai-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; background: #111; position: relative; }
         
+        /* Cabeçalho */
         .header { padding: 15px 20px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
         .version-box { display: flex; flex-direction: column; }
         .header h2 { margin: 0; font-size: 16px; color: var(--accent); letter-spacing: 1px; }
-        
         #version-selector { background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 5px; padding: 2px; font-size: 11px; margin-top: 5px; cursor: pointer; }
 
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: 0.3s; }
-        .back-btn:hover { background: var(--accent); color: white; }
+        .header-btns { display: flex; gap: 8px; }
+        .btn-ui { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: 0.3s; }
+        .btn-ui:hover { background: var(--accent); color: white; }
 
+        /* Janela de Chat */
         #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-        
         .msg { max-width: 80%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; animation: slideIn 0.2s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
         .msg.user { align-self: flex-end; background: var(--user-msg); color: white; border-bottom-right-radius: 2px; }
         .msg.bot { align-self: flex-start; background: #252526; border: 1px solid #333; border-bottom-left-radius: 2px; }
 
+        /* Área de Input */
         .input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; border-top: 1px solid #333; }
         input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; outline: none; }
         button#send { background: var(--accent); border: none; color: white; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        pre { background: #000; padding: 12px; border-radius: 8px; overflow-x: auto; color: #4fc3f7; border: 1px solid #222; font-family: 'Consolas', monospace; margin-top: 10px; }
-        code { color: #ffeb3b; }
+        /* MODAL DO COFRE DE DADOS */
+        #vault-modal { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .vault-card { background: var(--panel); padding: 25px; border-radius: 15px; border: 1px solid var(--accent); width: 85%; max-width: 350px; text-align: center; }
+        .vault-card h3 { color: var(--accent); margin-top: 0; }
+        .data-box { background: #000; text-align: left; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+        .data-label { font-size: 9px; color: #888; margin-bottom: 2px; }
+        .data-value { font-size: 13px; color: #fff; }
+
+        pre { background: #050505; padding: 12px; border-radius: 8px; overflow-x: auto; color: #4fc3f7; border: 1px solid #222; font-family: 'Consolas', monospace; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div id="ai-container">
+    <div id="vault-modal">
+        <div class="vault-card">
+            <h3>🔐 COFRE DE BIO</h3>
+            <div class="data-box">
+                <div class="data-label">NOME DO USUÁRIO</div>
+                <div id="v-nome">...</div>
+            </div>
+            <div class="data-box">
+                <div class="data-label">ESTADO DE ESPÍRITO</div>
+                <div id="v-estado">...</div>
+            </div>
+            <div class="data-box">
+                <div class="data-label">PROJETO/JOGO</div>
+                <div id="v-jogo">...</div>
+            </div>
+            <button class="btn-ui" style="width:100%; margin-top:15px;" onclick="closeVault()">FECHAR</button>
+        </div>
+    </div>
+
     <div class="header">
         <div class="version-box">
             <h2>🤖 NEXOS ENGINE</h2>
             <select id="version-selector">
-                <option value="0.1">v0.1 - Scripters (Direto)</option>
-                <option value="0.5">v0.5 - Bate-papo (Brain)</option>
+                <option value="0.1">v0.1 - Scripters</option>
+                <option value="0.5">v0.5 - Bate-papo</option>
             </select>
         </div>
-        <button class="back-btn" onclick="window.history.back()">VOLTAR AO STUDIO</button>
+        <div class="header-btns">
+            <button class="btn-ui" onclick="openVault()">⚙️ BIO</button>
+            <button class="btn-ui" onclick="window.history.back()">SAIR</button>
+        </div>
     </div>
 
-    <div id="chat-window">
-        </div>
+    <div id="chat-window"></div>
 
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Diga algo ou peça um código..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Pergunte ou diga algo..." autocomplete="off">
         <button id="send">ENVIAR</button>
     </div>
 </div>
@@ -66,14 +98,16 @@
     const sendBtn = document.getElementById('send');
     const versionSel = document.getElementById('version-selector');
 
-    // Inicialização da "Bio" (Memória Persistent via LocalStorage)
-    let memory = {
-        lastBotPrompt: localStorage.getItem('nexos_last_bot') || "",
-        userName: localStorage.getItem('nexos_user_name') || "Mestre"
+    // Inicialização da Memória (LocalStorage)
+    let bio = {
+        nome: localStorage.getItem('bio_user_name') || "Mestre",
+        estado: localStorage.getItem('bio_user_status') || "Focado",
+        jogo: localStorage.getItem('bio_user_game') || "Meu Projeto",
+        lastBot: ""
     };
 
-    // Mensagem de Boas-vindas baseada na memória
-    addMessage(`Olá ${memory.userName}! Sistema carregado. O que vamos desenvolver agora?`, 'bot');
+    // Mensagem Inicial
+    addMessage(`Olá ${bio.nome}. Estou pronta no modo v${versionSel.value}. Como vai o desenvolvimento do "${bio.jogo}"?`, 'bot');
 
     function addMessage(text, type) {
         const div = document.createElement('div');
@@ -83,61 +117,77 @@
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    async function processResponse() {
-        const rawText = userInput.value;
-        const text = rawText.toLowerCase().trim();
+    // Funções do Cofre
+    window.openVault = function() {
+        const pin = prompt("Senha do Cofre:");
+        if (pin === "1234") {
+            document.getElementById('v-nome').innerText = bio.nome;
+            document.getElementById('v-estado').innerText = bio.estado;
+            document.getElementById('v-jogo').innerText = bio.jogo;
+            document.getElementById('vault-modal').style.display = 'flex';
+        } else {
+            alert("Acesso negado.");
+        }
+    };
+
+    window.closeVault = function() {
+        document.getElementById('vault-modal').style.display = 'none';
+    };
+
+    async function process() {
+        const raw = userInput.value;
+        const text = raw.toLowerCase().trim();
         if(!text) return;
 
-        addMessage(rawText, 'user');
+        addMessage(raw, 'user');
         userInput.value = "";
 
         setTimeout(() => {
             let response = "";
 
-            // --- LÓGICA DE CONTINUIDADE (A IA lembra o que perguntou) ---
-            if (memory.lastBotPrompt.includes("tudo bem") && (text.includes("sim") || text.includes("estou"))) {
-                response = "Fico muito feliz em saber! O bom humor ajuda a codar melhor. Vamos para os scripts?";
-            } 
-            else if (memory.lastBotPrompt.includes("como se chama") || memory.lastBotPrompt.includes("seu nome")) {
-                let name = rawText.split(" ").pop();
-                localStorage.setItem('nexos_user_name', name);
-                memory.userName = name;
-                response = `Prazer em te conhecer, ${name}! Vou guardar seu nome na minha memória central.`;
+            // --- INTELIGÊNCIA DE BIO/CONVÍVIO ---
+            if (bio.lastBot.includes("como vai") || bio.lastBot.includes("tudo bem")) {
+                bio.estado = text;
+                localStorage.setItem('bio_user_status', text);
+                response = `Entendi. Guardei que você está se sentindo ${text}. Vamos focar no código então!`;
+            }
+            else if (text.includes("meu nome é") || text.includes("me chame de")) {
+                const n = raw.split(" ").pop();
+                bio.nome = n;
+                localStorage.setItem('bio_user_name', n);
+                response = `Beleza, te chamarei de ${n} a partir de agora!`;
+            }
+            else if (text.includes("nome do jogo é") || text.includes("projeto se chama")) {
+                const j = raw.split(" ").pop();
+                bio.jogo = j;
+                localStorage.setItem('bio_user_game', j);
+                response = `"${j}"? Nome brabo! Salvei aqui.`;
             }
 
-            // --- SE NÃO HOUVER CONTEXTO, USA O MOTOR SELECIONADO ---
+            // --- LÓGICA DE MOTOR ---
             if (!response) {
                 if (versionSel.value === "0.1") {
-                    // MODO SCRIPTER (Lógica rápida que você curtiu)
-                    response = "Processando lógica... Não reconheci esse comando de script.";
-                    if(text.includes("girar")) {
-                        response = "Aqui está seu destaque de rotação:\n<pre><code>function update() {\n  this.rotation.y += 0.05;\n}</code></pre>";
-                    } else if(text.includes("ceu") || text.includes("sky")) {
-                        response = "Para o céu: Selecione 'Sky' no Explorer e altere a URL da textura!";
-                    }
+                    if(text.includes("girar")) response = "Script de rotação:\n<pre><code>this.rotation.y += 0.05;</code></pre>";
+                    else if(text.includes("ceu") || text.includes("sky")) response = "Mude o céu no Explorer > Sky.";
+                    else response = "Modo Scripter ativo. Tente 'girar' ou 'pulo'.";
                 } else {
-                    // MODO BATE-PAPO (Usa o Brain.js)
-                    response = "Interessante... me conte mais sobre isso ou tente um comando de script.";
                     for (let item of brain) {
                         if (item.inputs.some(k => text.includes(k))) {
                             response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
                             break;
                         }
                     }
+                    if(!response) response = "Interessante... me conte mais ou mude para o modo Scripter.";
                 }
             }
 
-            // Salva o estado para a próxima interação
-            memory.lastBotPrompt = response.toLowerCase();
-            localStorage.setItem('nexos_last_bot', memory.lastBotPrompt);
-            
+            bio.lastBot = response.toLowerCase();
             addMessage(response, 'bot');
         }, 500);
     }
 
-    sendBtn.onclick = processResponse;
-    userInput.addEventListener("keypress", (e) => { if(e.key === "Enter") processResponse(); });
+    sendBtn.onclick = process;
+    userInput.addEventListener("keypress", (e) => { if(e.key === "Enter") process(); });
 </script>
-
 </body>
 </html>
