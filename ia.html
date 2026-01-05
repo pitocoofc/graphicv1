@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexos AI - Engine v1.4</title>
+    <title>Nexos AI - Engine v1.3</title>
     <style>
         :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; --user-msg: #6a1b9a; }
         body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); display: flex; height: 100vh; overflow: hidden; }
@@ -68,7 +68,6 @@
         <div class="version-box">
             <h2>🤖 NEXOS ENGINE</h2>
             <select id="version-selector">
-                <option value="1.4">v1.4 - Markov Neural</option>
                 <option value="0.1">v0.1 - Scripters</option>
                 <option value="0.5">v0.5 - Bate-papo</option>
             </select>
@@ -91,41 +90,6 @@
 <script type="module">
     import brain from './brain.js';
 
-    // --- CLASSE MARKOV INTEGRADA (v1.4) ---
-    class NexosMarkov {
-        constructor() {
-            this.database = {};
-            this.starts = [];
-        }
-        treinar(texto) {
-            const frases = texto.split(/(?<=[.!?])\s+/);
-            frases.forEach(f => {
-                const words = f.trim().split(/\s+/);
-                if (words.length < 2) return;
-                this.starts.push(words[0]);
-                for (let i = 0; i < words.length - 1; i++) {
-                    let cur = words[i].toLowerCase().replace(/[,]/g, "");
-                    if (!this.database[cur]) this.database[cur] = [];
-                    this.database[cur].push(words[i+1]);
-                }
-            });
-        }
-        gerar(seed) {
-            let cur = seed ? seed.toLowerCase() : this.starts[Math.floor(Math.random() * this.starts.length)];
-            let res = [cur];
-            for (let i = 0; i < 15; i++) {
-                let options = this.database[cur.replace(/[.!?]/g, "")];
-                if (!options) break;
-                let next = options[Math.floor(Math.random() * options.length)];
-                res.push(next);
-                cur = next.toLowerCase();
-                if (/[.!?]/.test(next)) break;
-            }
-            return res.join(" ");
-        }
-    }
-
-    const nexosMarkov = new NexosMarkov();
     const chatWindow = document.getElementById('chat-window');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send');
@@ -134,34 +98,20 @@
 
     let audioEnabled = true;
 
-    // --- TREINAMENTO GRAMATICAL (15 LINHAS) ---
-    const dataset = `
-    A consciência do desenvolvedor é o alicerce fundamental para a criação de mundos virtuais complexos.
-    Na Graphic Engine, a lógica de programação se funde com a estética visual de forma indissociável.
-    O ser humano busca a verdade através do código enquanto a máquina processa a realidade física.
-    Desenvolver é um ato de coragem onde a sintaxe correta define a existência de um objeto digital.
-    A performance de um sistema reflete a clareza mental de quem o projetou originalmente.
-    Toda função matemática possui um propósito oculto na engrenagem da simulação.
-    A arte de criar jogos exige paciência para iterar sobre erros até encontrar a beleza.
-    O código limpo é como uma poesia bem escrita para ser lida por mentes e máquinas.
-    A Nexos AI opera no limite entre a automação técnica e a intuição criativa do mestre.
-    No horizonte dos pixels, cada cor carrega um significado profundo sobre a percepção humana.
-    A arquitetura de software deve ser flexível como a filosofia e rígida como a lógica formal.
-    O tempo de execução é o recurso mais escasso na busca pelo realismo absoluto.
-    A imaginação precede a implementação tecnológica em todos os grandes projetos.
-    Um erro de compilação é apenas um convite para o aprofundamento do conhecimento técnico.
-    A harmonia entre hardware e software resulta na experiência imersiva perfeita.
-    `;
-    nexosMarkov.treinar(dataset);
-
+    // --- SISTEMA DE SÍNTESE DE VOZ ---
     function falar(texto) {
         if (!audioEnabled) return;
+        
+        // Limpar tags HTML para a IA não ler "menor que pre maior que"
         const textoLimpo = texto.replace(/<[^>]*>?/gm, '');
+        
         const msg = new SpeechSynthesisUtterance();
         msg.text = textoLimpo;
         msg.lang = 'pt-BR';
-        msg.rate = 1.2;
-        msg.pitch = 0.9;
+        msg.rate = 1.2;  // Um pouco mais rápido para parecer inteligente
+        msg.pitch = 0.9; // Tom levemente mais baixo/robótico
+        
+        // Cancela falas anteriores para não encavalar
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(msg);
     }
@@ -178,8 +128,10 @@
         lastBot: ""
     };
 
-    const saudacao = `Olá ${bio.nome}. Nexos Neural v${versionSel.value} ativa. O que vamos construir hoje?`;
+    // Mensagem Inicial
+    const saudacao = `Olá ${bio.nome}. Estou pronta no modo v${versionSel.value}. Como vai o desenvolvimento do "${bio.jogo}"?`;
     addMessage(saudacao, 'bot');
+    // Pequeno delay na primeira fala para o navegador carregar as vozes
     setTimeout(() => falar(saudacao), 1000);
 
     function addMessage(text, type) {
@@ -197,6 +149,72 @@
             document.getElementById('v-estado').innerText = bio.estado;
             document.getElementById('v-jogo').innerText = bio.jogo;
             document.getElementById('vault-modal').style.display = 'flex';
+        } else {
+            alert("Acesso negado.");
+        }
+    };
+
+    window.closeVault = function() {
+        document.getElementById('vault-modal').style.display = 'none';
+    };
+
+    async function process() {
+        const raw = userInput.value;
+        const text = raw.toLowerCase().trim();
+        if(!text) return;
+
+        addMessage(raw, 'user');
+        userInput.value = "";
+
+        setTimeout(() => {
+            let response = "";
+
+            if (bio.lastBot.includes("como vai") || bio.lastBot.includes("tudo bem")) {
+                bio.estado = text;
+                localStorage.setItem('bio_user_status', text);
+                response = `Entendi. Guardei que você está se sentindo ${text}. Vamos focar no código então!`;
+            }
+            else if (text.includes("meu nome é") || text.includes("me chame de")) {
+                const n = raw.split(" ").pop();
+                bio.nome = n;
+                localStorage.setItem('bio_user_name', n);
+                response = `Beleza, te chamarei de ${n} a partir de agora!`;
+            }
+            else if (text.includes("nome do jogo é") || text.includes("projeto se chama")) {
+                const j = raw.split(" ").pop();
+                bio.jogo = j;
+                localStorage.setItem('bio_user_game', j);
+                response = `"${j}"? Nome brabo! Salvei aqui.`;
+            }
+
+            if (!response) {
+                if (versionSel.value === "0.1") {
+                    if(text.includes("girar")) response = "Script de rotação gerado com sucesso.";
+                    else if(text.includes("ceu") || text.includes("sky")) response = "Mude o céu no Explorer, na aba Sky.";
+                    else response = "Modo Scripter ativo. Tente girar ou pulo.";
+                } else {
+                    for (let item of brain) {
+                        if (item.inputs.some(k => text.includes(k))) {
+                            response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
+                            break;
+                        }
+                    }
+                    if(!response) response = "Interessante... me conte mais ou mude para o modo Scripter.";
+                }
+            }
+
+            bio.lastBot = response.toLowerCase();
+            addMessage(response, 'bot');
+            falar(response); // A NEXOS FALA AQUI
+        }, 500);
+    }
+
+    sendBtn.onclick = process;
+    userInput.addEventListener("keypress", (e) => { if(e.key === "Enter") process(); });
+</script>
+</body>
+</html>
+ex';
         } else {
             alert("Acesso negado.");
         }
