@@ -207,6 +207,7 @@
     };
 
     async function process() {
+    async function process() {
     const raw = userInput.value;
     const text = raw.toLowerCase().trim();
     if(!text) return;
@@ -217,7 +218,7 @@
     setTimeout(() => {
         let response = "";
 
-        // 1. Prioridade: Dicionário Exato (Para comandos e saudações)
+        // 1. CAMADA HUMANA: Procura no brain.js primeiro (Saudações/Comandos)
         for (let item of brain) {
             if (item.inputs.some(k => text.includes(k))) {
                 response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
@@ -225,27 +226,30 @@
             }
         }
 
-        // 2. Se não for comando, usa a Cadeia de Markov (Bate-papo Filosófico)
+        // 2. CAMADA NEURAL: Se não achou no brain, usa Markov
         if (!response && versionSel.value === "1.4") {
             const words = text.split(" ");
-            const seed = words[words.length - 1];
+            const seed = words[words.length - 1]; // Pega a última palavra do usuário
             
-            // Tenta gerar com a semente, mas força a frase a ter pelo menos 4 palavras
-            response = nexosMarkov.gerar(seed);
+            // Tenta gerar uma frase. Se a semente for desconhecida, gera uma aleatória
+            let neuralRes = nexosMarkov.gerar(seed);
             
-            // Se a resposta for muito curta ou inválida, gera uma frase aleatória completa
-            if (response.split(" ").length < 3) {
-                response = nexosMarkov.gerar(); 
+            // TRAVA DE SEGURANÇA: Se a resposta for uma letra ou palavra solta, gera outra completa
+            if (neuralRes.split(" ").length < 3) {
+                neuralRes = nexosMarkov.gerar(); // Pega uma frase completa aleatória do dataset
             }
+            response = neuralRes;
         }
 
-        if(!response) response = "Interessante... Minha rede neural ainda está processando esse conceito.";
+        // 3. FALLBACK: Se tudo falhar
+        if(!response) response = "Interessante... me conte mais sobre isso ou mude para o modo Scripter.";
 
         bio.lastBot = response.toLowerCase();
         addMessage(response, 'bot');
-        falar(response);
+        if(window.falar) falar(response); 
     }, 600);
 }
+
 
         const text = raw.toLowerCase().trim();
         if(!text) return;
