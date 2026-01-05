@@ -3,93 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Studio - Assistente GitHub</title>
+    <title>IA Studio - Assistente</title>
     <style>
-        :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; }
+        :root { --bg: #0d0d0d; --panel: #1a1a1a; --accent: #9c27b0; --text: #e0e0e0; --user-msg: #6a1b9a; }
         body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
         #ai-container { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; background: #111; }
         
-        .header { padding: 20px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
-        .header h2 { margin: 0; font-size: 18px; color: var(--accent); }
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .header { padding: 20px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .header h2 { margin: 0; font-size: 18px; color: var(--accent); letter-spacing: 1px; }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: 0.3s; }
+        .back-btn:hover { background: var(--accent); color: white; }
 
-        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 14px; line-height: 1.5; animation: slideIn 0.2s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
-        .msg.user { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 2px; }
-        .msg.bot { align-self: flex-start; background: #252526; border: 1px solid #333; border-bottom-left-radius: 2px; }
+        /* Balões de Mensagem */
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; position: relative; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg.user { align-self: flex-end; background: var(--user-msg); color: white; border-bottom-right-radius: 2px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .msg.bot { align-self: flex-start; background: #252526; border: 1px solid #333; border-bottom-left-radius: 2px; color: #efefef; }
 
-        .input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; border-top: 1px solid #222; }
-        input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; outline: none; }
-        input:focus { border-color: var(--accent); }
-        button#send { background: var(--accent); border: none; color: white; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .input-area { padding: 20px; background: var(--panel); display: flex; gap: 10px; border-top: 1px solid #333; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 14px; border-radius: 10px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(156, 39, 176, 0.3); }
+        button#send { background: var(--accent); border: none; color: white; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button#send:hover { opacity: 0.8; transform: scale(0.95); }
 
-        pre { background: #000; padding: 10px; border-radius: 5px; overflow-x: auto; color: #4fc3f7; border: 1px solid #333; font-size: 12px; }
+        pre { background: #050505; padding: 12px; border-radius: 8px; overflow-x: auto; color: #4fc3f7; border: 1px solid #222; font-family: 'Consolas', monospace; margin-top: 10px; }
+        code { color: #ffeb3b; }
     </style>
 </head>
 <body>
 
 <div id="ai-container">
     <div class="header">
-        <h2>🤖 IA STUDIO</h2>
-        <button class="back-btn" onclick="location.href='index.html'">VOLTAR</button>
+        <h2>🤖 STUDIO IA <small style="color:gray; font-size: 10px; margin-left: 5px;">PROCESSANDO...</small></h2>
+        <button class="back-btn" onclick="window.history.back()">VOLTAR AO STUDIO</button>
     </div>
 
-    <div id="chat-window" id="chat-window">
-        <div class="msg bot">Conectada ao GitHub Pages. Dicionário <b>brain.js</b> ativo. Como posso ajudar no seu código hoje?</div>
+    <div id="chat-window">
+        <div class="msg bot">Olá! Eu sou o cérebro do Studio. Verifiquei seu projeto e estou pronta para ajudar. O que deseja fazer?</div>
     </div>
 
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Pergunte algo sobre o motor..." autocomplete="off">
-        <button id="send">ENVIAR</button>
+        <input type="text" id="user-input" placeholder="Digite uma mensagem ou comando..." autocomplete="off">
+        <button id="send" onclick="sendMessage()">ENVIAR</button>
     </div>
 </div>
 
-<script type="module">
-    // O './' é essencial no GitHub Pages para indicar que o arquivo está na mesma pasta
-    import brain from './brain.js';
+<script>
+    // --- DICIONÁRIO DE RESPOSTAS (BRAIN) ---
+    const brain = [
+        {
+            inputs: ["oi", "olá", "ola", "opa", "eai", "salve"],
+            outputs: [
+                "Olá, mestre! Como está o desenvolvimento hoje?",
+                "Opa! Tudo certo por aqui. Em que posso te ajudar?",
+                "Salve! Pronto para codar algo incrível?"
+            ]
+        },
+        {
+            inputs: ["quem é você", "seu nome", "o que faz", "função"],
+            outputs: [
+                "Sou a Inteligência Artificial nativa do seu Studio. Meu trabalho é facilitar a criação de scripts e cenários.",
+                "Eu ajudo você a programar e configurar o motor de jogo sem que você precise decorar todo o código!"
+            ]
+        },
+        {
+            inputs: ["girar", "rotação", "rodar", "girando"],
+            outputs: [
+                "Para fazer um objeto girar, você pode usar este script:\n<pre>function update() {\n  objeto.rotation.y += 0.02;\n}</pre>",
+                "Entendido! A rotação é feita alterando o valor de <code>rotation</code> no loop update."
+            ]
+        },
+        {
+            inputs: ["céu", "sky", "fundo", "imagem 360", "clima"],
+            outputs: [
+                "Você pode mudar o céu clicando em <b>Sky</b> no Explorer. Lá você cola a URL de uma imagem 360° (Equirectangular).",
+                "Quer um céu novo? Procure por 'HDRIs' gratuitas na internet, copie o link da imagem e cole nas propriedades do Sky!"
+            ]
+        },
+        {
+            inputs: ["pulo", "pular", "gravidade", "salto"],
+            outputs: [
+                "A força do pulo pode ser ajustada nas <b>Configurações Globais (⚙️)</b>. Procure por 'Tamanho do Pulo'.",
+                "Se quiser pular via script, você deve alterar a velocidade vertical do player quando uma tecla for pressionada!"
+            ]
+        },
+        {
+            inputs: ["ajuda", "comandos", "o que digitar"],
+            outputs: [
+                "Você pode me perguntar sobre: <b>rotação, pulo, como mudar o céu, ou pedir scripts básicos!</b>"
+            ]
+        }
+    ];
 
+    // --- LÓGICA DO CHAT ---
     const chatWindow = document.getElementById('chat-window');
     const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send');
+
+    function sendMessage() {
+        const rawText = userInput.value;
+        const text = rawText.toLowerCase().trim();
+        
+        if (!text) return;
+
+        // Adiciona mensagem do usuário
+        addMessage(rawText, 'user');
+        userInput.value = "";
+
+        // Simula "pensamento" da IA
+        setTimeout(() => {
+            let response = "Hmm, ainda não tenho uma resposta exata para isso no meu dicionário. Experimente perguntar sobre 'girar' ou 'céu'!";
+
+            // Busca no brain
+            for (let item of brain) {
+                const found = item.inputs.some(keyword => text.includes(keyword));
+                if (found) {
+                    response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
+                    break;
+                }
+            }
+
+            addMessage(response, 'bot');
+        }, 500);
+    }
 
     function addMessage(text, type) {
         const div = document.createElement('div');
         div.className = `msg ${type}`;
         div.innerHTML = text.replace(/\n/g, '<br>');
         chatWindow.appendChild(div);
+        
+        // Scroll automático para o final
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    function handleChat() {
-        const fullText = userInput.value;
-        const text = fullText.toLowerCase().trim();
-        
-        if (!text) return;
-
-        addMessage(fullText, 'user');
-        userInput.value = "";
-
-        setTimeout(() => {
-            let response = "Ainda não tenho essa informação no meu banco de dados (brain.js).";
-
-            for (let item of brain) {
-                const match = item.inputs.some(key => text.includes(key));
-                if (match) {
-                    response = item.outputs[Math.floor(Math.random() * item.outputs.length)];
-                    break;
-                }
-            }
-            addMessage(response, 'bot');
-        }, 400);
-    }
-
-    // Como é um módulo, ouvimos os eventos diretamente pelo ID
-    sendBtn.addEventListener('click', handleChat);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleChat();
+    // Atalho Enter
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
     });
 </script>
 
